@@ -2,7 +2,7 @@ import "../CSS/footer.css";
 function Footer(){
     return(
         <div className="footer-departament">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,</p>
+            <p>Located in the vibrant heart of egypt, united hanger has been a cornerstone of the clothing industry since its establishment in 2020.</p>
         </div>
     )
 }

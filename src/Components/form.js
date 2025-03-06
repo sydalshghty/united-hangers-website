@@ -1,8 +1,25 @@
 import "../CSS/form.css";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 function Form(){
+
+    const [DataSettings,setDataSettings] = useState([]);
+
+    const getAllSettings = async () => {
+        await fetch("https://united-hanger-2025.up.railway.app//api/settings",{
+            method: "GET"
+        })
+        .then(response => response.json())
+        .then(data => setDataSettings(data.settings))
+    }
+
+    useEffect(() => {
+        getAllSettings();
+    },[]);
+
+    console.log(DataSettings)
+
     const navigate = useNavigate();
     const handleClick = () => {
         navigate("/inquiry-Form")
@@ -128,9 +145,9 @@ function Form(){
                 </div>
                 <div className="address-content-two">
                     <h2 className="head">Business Hours</h2>
-                    <p>Saturday - Wedensday - 9am to 5pm</p>
-                    <p>Thursday - 9am to 2pm</p>
-                    <p>Friday - Closed</p>
+                    <p>{DataSettings.businesshours.slice(0,35)}</p>
+                    <p>{DataSettings.businesshours.slice(35,57)}</p>
+                    <p>{DataSettings.businesshours.slice(57,75)}</p>
                 </div>
             </div>
             <div className="form-content">

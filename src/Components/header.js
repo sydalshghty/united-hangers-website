@@ -5,28 +5,45 @@ import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import imgSlideOne from "../images/home (22).png";
 import imgSlideTwo from "../images/home (24).png";
 import imgHome23 from "../images/home (23).png";
-
+import { useCallback } from "react";
 function Header(){
+    const [aboutus,setaboutus] = useState("");
 
-    const [sliders,setSliders] = useState([]);
-
-    const getAllSliders = async () => {
-       await  fetch("/api/sliders",{
+    const getAboutUs = useCallback(async () => {
+        await fetch("https://united-hanger-2025.up.railway.app//api/settings",{
             method: "GET"
         })
-        .then((response) => response.json())
-        .then(data => setSliders(data.sliders))
-    }
-
-    useEffect(() => {
-        getAllSliders()
+        .then(respone => respone.json())
+        .then(data => setaboutus(data.settings.about_us))
     },[])
 
-    console.log(sliders)
+    useEffect(() => {
+        getAboutUs()
+    },[getAboutUs]);
+
+    const [dataSlider,setDataSlider] = useState([]);
+    
+    const getAllImageSlider = useCallback(async () => {
+        await fetch("https://united-hanger-2025.up.railway.app//api/sliders",{
+            method: "GET"
+        })
+        .then(respone => respone.json())
+        .then(data => setDataSlider(data.sliders))
+    },[])
+
+    console.log(dataSlider);
+
+    useEffect(() => {
+        getAllImageSlider();
+    },[getAllImageSlider])
 
     const [activeIndex, setActiveIndex] = useState(0);
 
-    const images = [imgSlideOne, imgSlideTwo];
+    const images = [imgSlideOne, imgSlideTwo, ...dataSlider.map((img,index) => {
+        return( 
+            img.image_path
+        )
+    })];
 
     const handleLeftClick = () => {
         setActiveIndex((prevIndex) => (prevIndex === 0 ? images.length - 1 : prevIndex - 1));
@@ -56,21 +73,125 @@ function Header(){
             rightIcons.classList.add("active");
         }
     }
+    
+    //
+        const [getAllSliders,setGetAllSliders] = useState([]);
+
+        const fetchSlidersData = async () => {
+          await  fetch("https://united-hanger-2025.up.railway.app//api/sliders",{
+            method: "GET"
+          })
+          .then(response => response.json())
+          .then(data => console.log(setGetAllSliders(data.sliders)))
+        }
+
+        useEffect(() => {
+            fetchSlidersData();
+        },[])
+
+        console.log(getAllSliders)
+
+        
+        const SliderTitle =  getAllSliders.map((item,index) => {
+            return(
+                item.title
+            )
+        })
+
+        SliderTitle.unshift("Durability & Strength");
+        SliderTitle.push("a style in every hang");
+
+        const countSlider = SliderTitle.length;
+
+        const [left,setLeft] = useState(0)
+
+        const handleLeftIncrease = () => {
+            if(left == countSlider - 1){
+                return false
+            }else{
+                return setLeft(left + 1);
+            }
+        }
+
+        const handleRightDecrease = () => {
+            if(left <= 0){
+                return false
+            }
+            else {
+                return setLeft(left - 1);
+            }
+        }
+
+        const TitleSlider = useRef("");
+        
+        const changeSliderP = () => {
+            if(TitleSlider.current){
+                TitleSlider.current.textContent = `${SliderTitle[left]}`
+            }
+        }
+    //
+
+    const SliderDescription = getAllSliders.map((item,index) => {
+        return(
+            item.description
+        )
+    })
+    SliderDescription.unshift("High-quality hangers that can hold heavy weights.");
+    SliderDescription.push("extensive product range caters to various sectors of the clothing industry, including babywear, kid's wear, teenage wear, lingerie,men's and women's wear.")
+
+    const countDescription = SliderDescription.length;
+    
+    const descriptionSlider = useRef("");
+
+    const [length,setLength] = useState(0);
+
+    const handleLengthIncrease = () => {
+        if(length == countDescription - 1){
+            return false
+        }else{
+            return setLength(length + 1)
+        }
+    }
+
+    const handleLenghtDecrease = () => {
+        if(length <= 0 ){
+            return false
+        }else{
+            return setLength(length - 1)
+        }
+    }
+
+    const changeDescription = () => {
+        if(descriptionSlider.current){
+            descriptionSlider.current.textContent = `${SliderDescription[length]}`
+        }
+    }
+
     const allLeftClickIcon = () => {
         handleLeftClick();
         clickIconLeft();
+        changeSliderP();
+        handleRightDecrease();
+        changeDescription();
+        handleLenghtDecrease();
     }
     const allRightClickIcon = () => {
         handleRightClick();
         clickIconRight();
+        changeSliderP();
+        handleLeftIncrease();
+        changeDescription();
+        handleLengthIncrease();
     }
+
+    //
     return(
         <div className="header">
             <div className="container">
                 <div className="text-content">
-                    <p className="p-one">a style in every hang</p>
+                    <p className="p-one" ref={TitleSlider}>a style in every hang</p>
                     <div className="paragraphs">
-                        <p>extensive product range caters to various sectors of the clothing industry, including babywear, kid's wear, teenage wear, lingerie,men's and women's wear.</p>
+                        <p ref={descriptionSlider}>extensive product range caters to various sectors of the clothing industry, including babywear, kid's wear, teenage wear, lingerie,men's and women's wear.</p>
                     </div>
                 </div>
                 <div className="icons" ref={myIcons}>
@@ -94,11 +215,8 @@ function Header(){
                 <div className="about-content">
                     <h3>about us ?</h3>
                     <div className="p-one-content">
-                            <p>
-                                united hanger company is proud to serve as a trusted partner to clothing manufacturers across the middle east and europe.
-                            </p>
-                            <p>
-                                we are committed to excellence in every aspect of our business, and we look forward to bringing your clothing creations to life with our premium hanger solution.
+                            <p style={{letterSpacing: "0.5px"}}>
+                                {aboutus}
                             </p>
                     </div>
                 </div>
@@ -109,8 +227,7 @@ function Header(){
             <div className="about-mobile">
                 <div className="container">
                     <h3>about us ?</h3>
-                    <p>united hanger company is proud to serve as a trusted partner to clothing manufacturers across the middle east and europe.</p>
-                    <p className="p-two"> we are committed to excellence in every aspect of our business, and we look forward to bringing your clothing creations to life with our premium hanger solution.</p>
+                    <p style={{letterSpacing: "0.5px"}}>{aboutus}</p>
                 </div>
             </div>
         </div>
